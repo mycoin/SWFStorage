@@ -1,0 +1,4 @@
+<url-policy>
+    <allow-access-from url="baidu.com" /> 
+    <allow-access-from url="shifen.com" /> 
+</url-policy>
