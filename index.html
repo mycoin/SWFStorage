@@ -10,7 +10,7 @@
         </style>
     </head>
     <body>
-    	<div id="result" style="height:0"></div>
+    	<div id="result"></div>
 		<textarea id="save" class="text" style="width: 80%; height:200px"></textarea>
 		<br />
 		<input class="btn" type="button" id="read-btn" value="read" />
@@ -25,7 +25,7 @@
 			document.getElementById("read-btn").onclick();
 		};
 		
-		baidu.swf.create({id: "flash", url: "localstorage.swf", width:0, height:0}, "result");
+		baidu.swf.create({id: "flash", url: "localstorage.swf", allowscriptaccess: "always", width: 0, height: 0}, "result");
 		document.getElementById("read-btn").onclick = function () {
 		    baidu.g("save").value = storage.getItem("test");
 		};

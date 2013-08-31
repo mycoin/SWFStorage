@@ -1,4 +1,4 @@
 <url-policy>
-	<allow-access-from url="baidu.com" />
-    <allow-access-from url="shifen.com" />
+	<allow-access-from domain="*" port="8800" />
+    <allow-access-from domain="shifen.com" />
 </url-policy>

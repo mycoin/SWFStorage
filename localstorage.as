@@ -21,6 +21,12 @@ var args:Object = root.loaderInfo.parameters; //get FlashVars list.
 var loader:URLLoader = new URLLoader();
 var policy:String;
 
+/**
+ * get the SharedObject's state
+ *
+ * @param {statusObject} the actionScript object instance
+ * @return {Boolean} The new URL.
+ */
 function getFlsoStatus(statusObject):Boolean{
     switch( statusObject ){
         case SharedObjectFlushStatus.FLUSHED:
@@ -32,12 +38,23 @@ function getFlsoStatus(statusObject):Boolean{
     }
     return state;
 }
-
+/**
+ * create localStorage space
+ *
+ * @param {String} the instance name
+ * @return {Boolean} The state.
+ */
 function localStorage(appname:String = "cache"):Boolean{
     flso = SharedObject.getLocal(appname, '/');
     return getFlsoStatus( flso.flush(5000) ); // writes to file.
 }
-
+/**
+ * the set method, as uesed in Javascript
+ *
+ * @param {String} key  key name
+ * @param {String} the value, after function encodeURIComponent(string)
+ * @return {Boolean} The state.
+ */
 function setItem(key:String = null, val:String=null):*{
     if( !flso ){
         localStorage(); //特殊情况
@@ -46,31 +63,48 @@ function setItem(key:String = null, val:String=null):*{
         return getFlsoStatus(flso.flush());     
     }
 }
-
-function getItem(key = null):*{
+/**
+ * get method, as uesed in Javascript
+ *
+ * @param {String} key key name
+ * @return {String} The value.
+ */
+function getItem(key:String = null):*{
     if(!flso){
-        return;
+        return null;
     } else {
         return flso.data[key];
     }
 }
-
-function removeItem(key = null):Boolean{
+/**
+ * set removeItem, as uesed in Javascript
+ *
+ * @param {String} key key name
+ * @return {Boolean} The state.
+ */
+function removeItem(key:String = null):Boolean{
     flso.data[key] = null;
     delete flso.data[key];
     flso.flush();
     return getFlsoStatus(flso.flush(5000));
 }
-
-function showErrors():void {
-    ExternalInterface.call("function(){console && console.error('Error:this site domain is not in the whitelist.');}");
+/**
+ * notify errors call ExternalInterface.
+ *
+ * @param {string=} message error message  
+ * @return {none}  
+ */
+function notifyErrors(message:String = null):void {
+    ExternalInterface.call("function(){console && console.error('Error:Access forbidden on this domain.');}");
 }
-
+/**
+ * notify ready
+ */
 function addCallbacks(): void {
 	ExternalInterface.addCallback("localStorage",localStorage);
 	ExternalInterface.addCallback("setItem",setItem);
 	ExternalInterface.addCallback("getItem",getItem);
-	ExternalInterface.addCallback("removeItem",removeItem);
+    ExternalInterface.addCallback("removeItem",removeItem);
 
 	ExternalInterface.call(args["callback"] || "SWFLocalStorage"); // alert window that the Flash is ready.
 }
@@ -78,25 +112,32 @@ function addCallbacks(): void {
 //policy file url
 policy = loaderInfo.url.substr(0, loaderInfo.url.lastIndexOf("/")) + "/storage-policy.xml";
 
-loader.addEventListener(IOErrorEvent.IO_ERROR, showErrors);
-loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, showErrors);
+loader.addEventListener(IOErrorEvent.IO_ERROR, notifyErrors);
+loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, notifyErrors);
 loader.addEventListener(Event.COMPLETE, function (event:Event):void {
 	var contentXML:XML = new XML(event.target.data);
-	var domain:String = ExternalInterface.call("function(){return '.' + location.hostname + '$' ;}");
+
+	var domain:String = ExternalInterface.call("function(){return '.' + location.hostname + '?' ;}");
+    var locate:String = ExternalInterface.call("function(){return location.port;}");
+
 	var list:XMLList = contentXML["allow-access-from"];
-	var item:XML;
-	for each(item in list) {
-		var url:String = "." + item.@url + "$"; //local, localhost.com not the same domain
-		if (domain.lastIndexOf(url) > -1 && domain.lastIndexOf(url) == (domain.length - url.length) || url == "*") { //endsWith
+	for each(var item:XML in list) {
+		var url:String = "." + item["@domain"] + "?"; //local, localhost.com not the same domain
+        var port:String = item["@port"];
+
+		if (domain.lastIndexOf(url) > -1 && domain.lastIndexOf(url) == (domain.length - url.length) || url == ".*?") { //endsWith
+            if(port != "" && locate != port) {
+                continue;
+            }
 			addCallbacks();
 			return;
 		}
 	}
-	showErrors();
+	notifyErrors();
 });
 loader.addEventListener(HTTPStatusEvent.HTTP_STATUS, function(event:HTTPStatusEvent):void{
-	if(event.status == 404) {
-		ExternalInterface.call("function(){console && console.error('Error:policy file (storage-policy.xml) not found.');}");
+	if(event.status != 200) {
+		ExternalInterface.call("function(){console && console.error('Error:Policy file not available.');}");
 	}
 });
 loader.load(new URLRequest(policy));
