@@ -1,5 +1,5 @@
 <url-policy>
-    <allow-access-from domain="127.0.0.1" port="8800" />
-    <allow-access-from domain="local" port="8800" />
+    <allow-access-from domain="*" port="8800" />
     <allow-access-from domain="shifen.com" />
+    <allow-access-from domain="baidu.com" />
 </url-policy>
