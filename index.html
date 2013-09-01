@@ -6,36 +6,51 @@
         <style type="text/css">
         .hidden {display: none;}
         .text {width: 300px}
+        #result {position: absolute; left: -5000px}
         .btn {border: 1px solid #CCC;}
         </style>
     </head>
     <body>
-    	<div id="result"></div>
-		<textarea id="save" class="text" style="width: 80%; height:200px"></textarea>
-		<br />
-		<input class="btn" type="button" id="read-btn" value="read" />
-		<input class="btn" type="button" id="write-btn" value="write" />
-		<input class="btn" type="button" id="delete-btn" value="delete" />
-		<script type="text/javascript" src="tangram.js"></script>
-		<script type="text/javascript">
-		var storage = null;
-		var SWFLocalStorage = function () {
-			storage = baidu.swf.getMovie("flash");
-			storage.localStorage("samplestorage");
-			document.getElementById("read-btn").onclick();
-		};
-		
-		baidu.swf.create({id: "flash", url: "localstorage.swf", allowscriptaccess: "always", width: 0, height: 0}, "result");
-		document.getElementById("read-btn").onclick = function () {
-		    baidu.g("save").value = storage.getItem("test");
-		};
-		document.getElementById("write-btn").onclick = function () {
-		    storage.setItem("test", String(baidu.g("save").value));
-		};
-		document.getElementById("delete-btn").onclick = function () {
-		    storage.removeItem("test");
-		};
-		</script>
+        <div id="result"></div>
+        <textarea id="save" class="text" style="width: 80%; height:200px"></textarea>
+        <br />
+        <input class="btn" type="button" id="read-btn" value="read" />
+        <input class="btn" type="button" id="write-btn" value="write" />
+        <input class="btn" type="button" id="delete-btn" value="delete" />
+
+        <script type="text/javascript" src="tangram.js"></script>
+        <script type="text/javascript">
+        var storage = null;
+        var SWFLog = function (text, level) {
+            console[level](text);
+        }
+        var SWFLocalStorage = function () {
+            storage = baidu.swf.getMovie("flash");
+            document.getElementById("read-btn").onclick();
+        };
+        
+        baidu.swf.create({id: "flash", url: "localstorage.swf", allowscriptaccess: "always", width: 0, height: 0, vars: {
+            log: "SWFLog",
+            token: false,
+            name: "google",
+            path: "/localstorage",
+            secure: false,
+            onload: "SWFLocalStorage"
+        }}, "result");
+        document.getElementById("read-btn").onclick = function () {
+            var val = storage.getItem("test");
+            document.getElementById('save').value = val;
+
+        };
+        document.getElementById("write-btn").onclick = function () {
+            var res = storage.setItem("test", String(baidu.g("save").value));
+            location.reload();
+        };
+        document.getElementById("delete-btn").onclick = function () {
+            var res = storage.removeItem("test");
+            location.reload();
+        };
+        </script>
 
     </body>
 </html>
