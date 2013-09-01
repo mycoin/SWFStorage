@@ -160,7 +160,7 @@ function getItem(key: String): * {
  * @return {String} The value.
  */
 
-function getAllItem(): * {
+function getAll(): * {
     if (!flsso) {
         return null;
     } else {
@@ -192,7 +192,7 @@ function addInterface(): void {
     try {
         // expose our external interface
         ExternalInterface.addCallback("setItem", setItem);
-        ExternalInterface.addCallback("getAllItem", getAllItem);
+        ExternalInterface.addCallback("getAll", getAll);
         ExternalInterface.addCallback("getItem", getItem);
         ExternalInterface.addCallback("removeItem", removeItem);
         Log('ready!');
