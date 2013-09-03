@@ -38,12 +38,6 @@ ExternalInterface.marshallExceptions = true;
 var flsso: SharedObject = null;
 
 /**
- * create localStorage space
- *
- * @param {String} the instance name
- * @return {Boolean} The state.
- */
-/**
  * start, sets up everything and exports all config.
  * Call this automatically by setting Publish > Class tp "Storage" in your .fla properties.
  *
@@ -51,7 +45,7 @@ var flsso: SharedObject = null;
  */
 
 function start(): Boolean {
-    //The name of LSO
+    //The default name of LSO
     var name: String = "baidu";
 
     if (flsso != null) {
@@ -75,10 +69,15 @@ function start(): Boolean {
     }
 
     var secure: Boolean = false;
+    var protocol: String = ExternalInterface.call("function(){return location.protocol;}");
     // grab the secure config if supplied
     //see: http://livedocs.adobe.com/flash/9.0_cn/main/wwhelp/wwhimpl/common/html/wwhelp.htm?context=LiveDocs_Parts&file=00002122.html
     if (this.loaderInfo.parameters["secure"]) {
         secure = ("true" == this.loaderInfo.parameters["secure"]);
+        if(secure && protocol != "https:") {
+            Log("Protocol not match, change secure to false.");
+            secure = false;
+        }
     }
 
     //By default, an application can create shared objects of up 100 KB of data per domain. 
@@ -224,6 +223,7 @@ function addInterface(): void {
     } catch (e: Error) {
         Log("An Error occurred: " + e.message, "warn");
     }
+    Log("All external interfaces added.");
 }
 
 /**
@@ -240,20 +240,23 @@ function entry(): * {
     }
     Log('Initializing...');
     var allow = this.loaderInfo.parameters["token"] == "false";
+    
+    // This is necessary to work cross-domain
+    // Ideally you should add only the domains that you need.
+    // More information: http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/system/Security.html#allowDomain%28%29
+    Security.allowDomain("*");
+    Security.allowInsecureDomain("*");
     if (allow) {
-        // This is necessary to work cross-domain
-        // Ideally you should add only the domains that you need.
-        // More information: http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/system/Security.html#allowDomain%28%29
-        Security.allowDomain("*");
-        Security.allowInsecureDomain("*");
-
         Log('Access allowed from all domains. ');
         addInterface();
         return null;
     }
+
+    var origin: String = ExternalInterface.call("function(){return location.origin;}");
     var domain: String = ExternalInterface.call("function(){return '.' + location.hostname + '?' ;}");
     var locate: String = ExternalInterface.call("function(){return location.port;}");
 
+    // Security.loadPolicyFile(origin + "/crossdomain.xml")
     var net: URLLoader = new URLLoader();
     net.addEventListener(Event.COMPLETE, function(event: Event): void {
         var contentXML: XML = new XML(event.target.data);

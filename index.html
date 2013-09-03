@@ -5,7 +5,7 @@
         <title>SWFLocalStorage</title>
         <style type="text/css">
         .hidden {display: none;}
-        .text {width: 300px}
+        .text {width: 300px; border: 1px solid #CCC; outline: none;resize:none;}
         #result {position: absolute; left: -5000px}
         .btn {border: 1px solid #CCC;}
         </style>
@@ -23,7 +23,7 @@
         var storage = null;
         var SWFLog = function (text, level) {
             console[level](text);
-        }
+        };
         var SWFLocalStorage = function () {
             storage = baidu.swf.getMovie("flash");
             document.getElementById("read-btn").onclick();
@@ -31,15 +31,16 @@
         
         baidu.swf.create({id: "flash", url: "localstorage.swf", allowscriptaccess: "always", width: 0, height: 0, vars: {
             log: "SWFLog",
-            token: false,
-            name: "google",
-            path: "/localstorage",
-            secure: false,
+            token: true,
+            name: "s",
+            path: "/",
+            secure: true,
             onload: "SWFLocalStorage"
         }}, "result");
         document.getElementById("read-btn").onclick = function () {
             var val = storage.getItem("test");
-            document.getElementById('save').value = val;
+            document.getElementById('save').value = "...";
+            setTimeout(function() {document.getElementById('save').value = val;}, 300);
 
         };
         document.getElementById("write-btn").onclick = function () {

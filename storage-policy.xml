@@ -1,5 +1,6 @@
-<url-policy>
-    <allow-access-from domain="*" port="8800" />
+<storage-policy>
+    <allow-access-from domain="mycoin.net" port="8800" />
+    <allow-access-from domain="local" />
     <allow-access-from domain="shifen.com" />
     <allow-access-from domain="baidu.com" />
-</url-policy>
+</storage-policy>
