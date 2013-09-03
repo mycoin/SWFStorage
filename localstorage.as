@@ -68,9 +68,9 @@ function start(): Boolean {
         localPath = this.loaderInfo.parameters["path"];
     }
 
-    var secure: Boolean = false;
     var protocol: String = ExternalInterface.call("function(){return location.protocol;}");
     // grab the secure config if supplied
+    var secure: Boolean = "https:" == protocol;
     //see: http://livedocs.adobe.com/flash/9.0_cn/main/wwhelp/wwhimpl/common/html/wwhelp.htm?context=LiveDocs_Parts&file=00002122.html
     if (this.loaderInfo.parameters["secure"]) {
         secure = ("true" == this.loaderInfo.parameters["secure"]);

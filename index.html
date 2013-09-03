@@ -31,10 +31,10 @@
         
         baidu.swf.create({id: "flash", url: "localstorage.swf", allowscriptaccess: "always", width: 0, height: 0, vars: {
             log: "SWFLog",
-            token: true,
-            name: "s",
+            token: false,
+            name: "baidu",
             path: "/",
-            secure: true,
+            // secure: true,
             onload: "SWFLocalStorage"
         }}, "result");
         document.getElementById("read-btn").onclick = function () {
