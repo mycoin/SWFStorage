@@ -1,9 +1,7 @@
 /**
  * SWFLocalStorage - a JavaScript library for cross-domain flash LocalStorage
  *
- * https://github.com/mycoin/localstorage
- *
- * Copyright 2012 Baidu Inc. All rights reserved.
+ * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * date:    2013/08/28
+ * author:  mycoin (nqliujiangtao@gmail.com)
+ * date:    2013/08/08
+ * resp:    https://github.com/mycoin/localstorage
  */
 import flash.display.Sprite;
 import flash.net.SharedObject;
