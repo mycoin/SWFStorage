@@ -46,45 +46,48 @@ var flsso: SharedObject = null;
 
 function start(): Boolean {
     //The default name of LSO
-    var name: String = "baidu";
+    var name: String = 'baidu';
 
     if (flsso != null) {
-        Log("The sharedObject has already created .", 'warn');
+        Log('The sharedObject has already created .', 'warn');
         return false;
     }
     // grab the namespace if supplied
-    if (this.loaderInfo.parameters["name"]) {
-        name = this.loaderInfo.parameters["name"];
+    if (this.loaderInfo.parameters['name']) {
+        name = this.loaderInfo.parameters['name'];
     }
     /**
      * The path of LSO
      * This defaults to "/path/to/localStorage.swf" which prevents any other .swf from reading it's values.
      * Similar to cookies, set it to "/" to allow any other .swf on the domain to read from this LSO.
      */
-    var localPath: String = "/";
+    var localPath: String = '/';
 
     // grab the path if supplied
-    if (this.loaderInfo.parameters["path"]) {
-        localPath = this.loaderInfo.parameters["path"];
+    if (this.loaderInfo.parameters['path']) {
+        localPath = this.loaderInfo.parameters['path'];
     }
 
-    var protocol: String = ExternalInterface.call("function(){return location.protocol;}");
+    var protocol: String = ExternalInterface.call('function(){return location.protocol;}');
+    
     // grab the secure config if supplied
-    var secure: Boolean = "https:" == protocol;
+    var secure: Boolean = 'https:' == protocol;
+    
     //see: http://livedocs.adobe.com/flash/9.0_cn/main/wwhelp/wwhimpl/common/html/wwhelp.htm?context=LiveDocs_Parts&file=00002122.html
-    if (this.loaderInfo.parameters["secure"]) {
-        secure = ("true" == this.loaderInfo.parameters["secure"]);
-        if(secure && protocol != "https:") {
-            Log("Protocol not match, change secure to false.");
+    if (this.loaderInfo.parameters['secure']) {
+        secure = ('true' == this.loaderInfo.parameters['secure']);
+        if(secure && protocol != 'https:') {
+            Log('Protocol not match, change secure to false.');
             secure = false;
         }
     }
 
     //By default, an application can create shared objects of up 100 KB of data per domain. 
     try {
-        Log("LocalStorage, name: " + name + ", localPath: " + localPath + ", secure: " + secure);
+        Log('LocalStorage, name: ' + name + ', localPath: ' + localPath + ', secure: ' + secure);
         flsso = SharedObject.getLocal(name, localPath, secure);
-    } catch (e: Error) {
+    } 
+    catch (e: Error) {
         // user probably unchecked their "allow third party data" in their global flash settings
         Log('Unable to create a local sharedObject. -' + e.message, 'warn');
         return false;
@@ -101,13 +104,14 @@ function flush(): Boolean {
     var status: String = null;
     try {
         status = flsso.flush(10000);
-    } catch (e: Error) {
-        Log("Error: Could not write SharedObject to disk - " + e.message);
+    } 
+    catch (e: Error) {
+        Log('Error: Could not write SharedObject to disk - ' + e.message);
     }
     if (status != null) {
         switch (status) {
             case SharedObjectFlushStatus.PENDING:
-                Log("Requesting permission to save SharedObject...");
+                Log('Requesting permission to save SharedObject...');
                 flsso.addEventListener(NetStatusEvent.NET_STATUS, onFlushStatus);
                 break;
             case SharedObjectFlushStatus.FLUSHED:
@@ -123,13 +127,13 @@ function flush(): Boolean {
  */
 
 function onFlushStatus(event: NetStatusEvent): void {
-    Log("User closed permission dialog...");
+    Log('User closed permission dialog...');
     switch (event.info.code) {
-        case "SharedObject.Flush.Success":
-            Log("User granted permission -- value saved.");
+        case 'SharedObject.Flush.Success':
+            Log('User granted permission -- value saved.');
             break;
-        case "SharedObject.Flush.Failed":
-            Log("User denied permission -- value not saved.");
+        case 'SharedObject.Flush.Failed':
+            Log('User denied permission -- value not saved.');
             break;
     }
     flsso.removeEventListener(NetStatusEvent.NET_STATUS, onFlushStatus);
@@ -142,7 +146,7 @@ function onFlushStatus(event: NetStatusEvent): void {
  */
 
 function setItem(key: String = null, value: *= null): * {
-    if (typeof value != "string") {
+    if (typeof value != 'string') {
         value = value.toString();
     }
     flsso.data[key] = value;
@@ -158,7 +162,8 @@ function setItem(key: String = null, value: *= null): * {
 function getItem(key: String): * {
     try {
         return flsso.data[key];
-    } catch (e: Error) {
+    } 
+    catch (e: Error) {
         Log('Unable to read data - ' + e.message);
     }
 }
@@ -172,7 +177,8 @@ function getItem(key: String): * {
 function getAll(): * {
     if (!flsso) {
         return null;
-    } else {
+    } 
+    else {
         return flsso.data;
     }
 }
@@ -188,8 +194,9 @@ function removeItem(key: String = null): Boolean {
         flsso.data[key] = null;
         delete flsso.data[key];
         return flush();
-    } catch (e: Error) {
-        Log("Error deleting key - " + e.message);
+    } 
+    catch (e: Error) {
+        Log('Error deleting key - ' + e.message);
     }
     return false;
 }
@@ -200,30 +207,33 @@ function removeItem(key: String = null): Boolean {
 function addInterface(): void {
     try {
         // expose our external interface
-        ExternalInterface.addCallback("setItem", setItem);
-        ExternalInterface.addCallback("getAll", getAll);
-        ExternalInterface.addCallback("getItem", getItem);
-        ExternalInterface.addCallback("removeItem", removeItem);
+        ExternalInterface.addCallback('setItem', setItem);
+        ExternalInterface.addCallback('getAll', getAll);
+        ExternalInterface.addCallback('getItem', getItem);
+        ExternalInterface.addCallback('removeItem', removeItem);
         Log('ready!');
 
         start();
         // if onload was set in the flashvars, assume it's a string function name and call it after started.
         // (This means that the function must be in the global scope. I'm not sure how to call a scoped function.)
-        var callback = this.loaderInfo.parameters["onload"];
+        var callback = this.loaderInfo.parameters['onload'];
         if (callback) {
             // and we're done!
             try {
                 ExternalInterface.call(callback);
-            } catch (e: Error) {
-                Log("An Error occurred in method " + callback + " that provided.", "warn");
+            } 
+            catch (e: Error) {
+                Log('An Error occurred in method ' + callback + ' that provided.', 'warn');
             }
         }
-    } catch (e: SecurityError) {
-        Log("A SecurityError occurred: " + e.message, "warn");
-    } catch (e: Error) {
-        Log("An Error occurred: " + e.message, "warn");
+    } 
+    catch (e: SecurityError) {
+        Log('A SecurityError occurred: ' + e.message, 'warn');
+    } 
+    catch (e: Error) {
+        Log('An Error occurred: ' + e.message, 'warn');
     }
-    Log("All external interfaces added.");
+    Log('All external interfaces added.');
 }
 
 /**
@@ -235,38 +245,38 @@ function addInterface(): void {
 function entry(): * {
     // Make sure we can talk to javascript at all
     if (!ExternalInterface.available) {
-        localLog("External Interface is not avaliable.");
+        localLog('External Interface is not avaliable.');
         return false;
     }
     Log('Initializing...');
-    var allow = this.loaderInfo.parameters["token"] == "false";
+    var allow = this.loaderInfo.parameters['token'] == 'false';
     
     // This is necessary to work cross-domain
     // Ideally you should add only the domains that you need.
     // More information: http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/system/Security.html#allowDomain%28%29
-    Security.allowDomain("*");
-    Security.allowInsecureDomain("*");
+    Security.allowDomain('*');
+    Security.allowInsecureDomain('*');
     if (allow) {
         Log('Access allowed from all domains. ');
         addInterface();
         return null;
     }
 
-    var origin: String = ExternalInterface.call("function(){return location.origin;}");
+    var origin: String = ExternalInterface.call('function(){return location.origin;}');
     var domain: String = ExternalInterface.call("function(){return '.' + location.hostname + '?' ;}");
-    var locate: String = ExternalInterface.call("function(){return location.port;}");
+    var locate: String = ExternalInterface.call('function(){return location.port;}');
 
     // Security.loadPolicyFile(origin + "/crossdomain.xml")
     var net: URLLoader = new URLLoader();
     net.addEventListener(Event.COMPLETE, function(event: Event): void {
         var contentXML: XML = new XML(event.target.data);
-        var list: XMLList = contentXML["allow-access-from"];
+        var list: XMLList = contentXML['allow-access-from'];
         for each(var item: XML in list) {
-            var url: String = "." + item["@domain"] + "?"; //local, localhost.com not the same domain
-            var port: String = item["@port"];
+            var url: String = '.' + item['@domain'] + '?'; //local, localhost.com not the same domain
+            var port: String = item['@port'];
 
             if (domain.lastIndexOf(url) > -1 && domain.lastIndexOf(url) == (domain.length - url.length) || url == ".*?") { //endsWith
-                if (port != "" && locate != port) {
+                if (port != '' && locate != port) {
                     continue;
                 }
                 addInterface();
@@ -279,10 +289,10 @@ function entry(): * {
     net.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onError);
     net.addEventListener(HTTPStatusEvent.HTTP_STATUS, function(event: HTTPStatusEvent): void {
         if (event.status != 200) {
-            onError("Policy file not available.");
+            onError('Policy file not available.');
         }
     });
-    net.load(new URLRequest(loaderInfo.url.substr(0, loaderInfo.url.lastIndexOf("/")) + "/storage-policy.xml"));
+    net.load(new URLRequest(loaderInfo.url.substr(0, loaderInfo.url.lastIndexOf('/')) + '/storage-policy.xml'));
 }
 
 /**
@@ -297,10 +307,10 @@ function localLog(str: String): void {
     if (!textArea) {
         // create the text field if it doesn't exist yet
         textArea = new TextField();
-        textArea.width = 450; // I suspect there's a way to do "100%"...
+        textArea.width = 450; // I suspect there's a way to do '100%'...
         addChild(textArea);
     }
-    textArea.appendText(str + "\n");
+    textArea.appendText(str + '\n');
 }
 
 /**
@@ -308,19 +318,21 @@ function localLog(str: String): void {
  * if that fails it passes them to localLog()
  */
 
-function Log(str: * , type: String = "debug"): void {
+function Log(str: * , type: String = 'debug'): void {
     var logFunc: String = null;
 
     // since even logging involves communicating with javascript,
     // the next thing to do is find the external log function
-    if (this.loaderInfo.parameters["log"]) {
-        logFunc = this.loaderInfo.parameters["log"];
+    if (this.loaderInfo.parameters['log']) {
+        logFunc = this.loaderInfo.parameters['log'];
     }
     if (logFunc) {
         try {
             ExternalInterface.call(logFunc, str, type);
-        } catch (error: Error) {}
-    } else {
+        } 
+        catch (error: Error) {}
+    } 
+    else {
         localLog(str);
     }
 }
@@ -333,13 +345,15 @@ function Log(str: * , type: String = "debug"): void {
 
 function onError(message: String=null): void {
     try {
-        if (ExternalInterface.available && this.loaderInfo.parameters["onerror"]) {
-            ExternalInterface.call(this.loaderInfo.parameters["onerror"], message);
-        } else {
-            Log(message, "error");
+        if (ExternalInterface.available && this.loaderInfo.parameters['onerror']) {
+            ExternalInterface.call(this.loaderInfo.parameters['onerror'], message);
+        } 
+        else {
+            Log(message, 'error');
         }
-    } catch (error: Error) {
-        Log('Error attempting with onerror callback.', "error");   
+    } 
+    catch (error: Error) {
+        Log('Error attempting with onerror callback.', 'error');   
     }
 }
 
