@@ -5,7 +5,7 @@
         <title>SWFLocalStorage</title>
         <style type="text/css">
         .hidden {display: none;}
-        .text {width: 300px; border: 1px solid #CCC; outline: none;resize:none;}
+        .text {width: 300px; outline: none;resize:none;}
         #result {position: absolute; left: -5000px}
         .btn {border: 1px solid #CCC;}
         </style>
@@ -34,7 +34,7 @@
             token: true,
             name: "baidu",
             path: "/",
-            // secure: true,
+            secure: true,
             onload: "SWFLocalStorage"
         }}, "result");
         document.getElementById("read-btn").onclick = function () {

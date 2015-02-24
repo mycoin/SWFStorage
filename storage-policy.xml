@@ -1,6 +1,5 @@
 <storage-policy>
-    <allow-access-from domain="mycoin.net" port="8800" />
+    <allow-access-from domain="localhost" port="8080" />
     <allow-access-from domain="local" />
     <allow-access-from domain="shifen.com" />
-    <allow-access-from domain="baidu.com" />
 </storage-policy>
